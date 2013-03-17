@@ -46,37 +46,11 @@ switch($pub_subaction)
 	break;
 	
 	//
-	case "report" :
-		//
-		// TODO - Controler le droit d'ajout
-		//
-		require_once("mod/allyranking/postReport.php");
-	break;
-	
-	//
 	case "detail" : 
 		require_once("mod/allyranking/detail.php");
 	break;
 	
 	//
-	case "datasend" :
-		//
-		// TODO - Controler le droit d'ajout
-		//
-		require_once("mod/allyranking/postReport.php");
-	break;
-	
-	//
-	case "dropranking" :
-		require_once("mod/allyranking/delReport.php");
-	break;
-	
-	
-	// Cas particulier : Mise à jour du logiciel
-	case "update" :
-		require_once("mod/allyranking/update.php");
-	break;
-	
 	//
 	default :
 		require_once("mod/allyranking/allyRanking.php");

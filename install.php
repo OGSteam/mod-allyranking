@@ -14,17 +14,7 @@
 	/**
 	 * Fichier de fonctions du module allyRanking
 	 */
-	require_once("mod/allyranking/ARinclude.php");
-	
-	$tablename = TABLE_RANK_MEMBERS;
-	if ($tablename=="TABLE_RANK_MEMBERS") { 
-		die("Variable TABLE_RANK_MEMBERS non définie ! Installation impossible.");
-	}
-	
-// Avant tout, faire le ménage pour que les requetes s'executent correctement !
-	$db->sql_query("DELETE FROM ".TABLE_MOD." WHERE title='allyranking'",DEBUG,true);
-	$db->sql_query("DROP TABLE IF EXISTS ".TABLE_RANK_MEMBERS,DEBUG,true);
-	$db->sql_query("DELETE FROM ".TABLE_CONFIG." WHERE config_name='tagRanking'",DEBUG,true);
+
 	
 //Insertion du champs pour la declaration du module dans OGSpy
 	$is_ok = false;
@@ -32,17 +22,6 @@
 	$is_ok = install_mod($mod_folder);
 if ($is_ok == true)
 	{
-		//Insertion d'un nouveau paramètre tagRanking
-		$query = "INSERT INTO ".TABLE_CONFIG." (config_name, config_value) VALUES ('tagRanking','');";
-		$db->sql_query($query,DEBUG,true);
-		$query = "CREATE TABLE `".TABLE_RANK_MEMBERS."` (";
-		$query .=   "`datadate` int(11) NOT NULL,";
-		$query .=   "`player` varchar(30) NOT NULL,";
-		$query .=   "`points` int(11) NOT NULL,";
-		$query .=   "`ally` varchar(30),";
-		$query .=   "`sender_id` int(11) NOT NULL,";
-		$query .=   "PRIMARY KEY  (`datadate`,`player`))";
-		$db->sql_query($query,DEBUG,true);
 	
 		//On vérifie que la table xtense_callbacks existe (Xtense2)
 		if( mysql_num_rows( mysql_query("SHOW TABLES LIKE '".$table_prefix."xtense_callbacks"."'")))

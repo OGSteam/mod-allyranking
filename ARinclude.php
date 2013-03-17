@@ -8,17 +8,16 @@
 
 
 global $table_prefix;
-define("DEBUG",false);
+
 //================================================================================
 //================================================================================
 //									DEFINES
 //================================================================================
 //================================================================================
-define("TABLE_RANK_MEMBERS",$table_prefix."rank_members");
 define("MODULE_NAME","allyranking");
 define("MODULE_ACTION","allyranking");
 define("MODULE_DIR","allyranking");
-define("MODULE_VERSION","0.4f");
+define("MODULE_VERSION","0.4");
 define("MENU_ICON","<img align=\"absmiddle\" src=\"./mod/allyranking/images/graph_icon16.gif\">");
 
 
@@ -27,60 +26,6 @@ define("MENU_ICON","<img align=\"absmiddle\" src=\"./mod/allyranking/images/grap
 //								Liste des fonctions
 //================================================================================
 //================================================================================
-
-/**
- * Fonction de débogage
- */
-function dbg($message){
-
-	if (DEBUG) echo "<table Width='100%'><tr><th>$message</th></tr></table>";
-}
-
-function membersList()
-{
-	global $db;
-	$list="";
-	$query = "SELECT DISTINCT player FROM ".TABLE_RANK_MEMBERS." ORDER BY player";
-	$result = $db->sql_query($query);
-
-	while ( list($player) = $db->sql_fetch_row())
-	{
-		$list .= "\t\t\t\t\t\t<option value='".$player."'>".$player."</option>\n";
-	}
-	return $list;
-}
-
-function deleteOlder($nbdays)
-{
-	global $db;
-	$nbsec = $nbdays * 24 * 3600;
-	$today = getdate();
-	$olderdate = $today[0] - $nbsec;
-	$query = "delete from ".TABLE_RANK_MEMBERS." WHERE datadate < $olderdate";
-
-	$db->sql_query($query);
-}
-
-function deleteMemberRanking($name1)
-{
-	global $db;
-	$query = "DELETE FROM ".TABLE_RANK_MEMBERS." WHERE PLAYER='$name1'";
-	$db->sql_query($query);
-}
-
-function renameMember($name1,$name2)
-{
-	global $db;
-	$query = "UPDATE ".TABLE_RANK_MEMBERS." SET player='$name2' WHERE PLAYER='$name1'";
-	$db->sql_query($query);
-}
-
-function changeAlly($name,$ally)
-{
-	global $db;
-	$query = "UPDATE ".TABLE_RANK_MEMBERS." SET ally='$ally' WHERE PLAYER='$name'";
-	$db->sql_query($query);
-}
 
 function getMenuStatus()
 {
@@ -107,7 +52,6 @@ function getMenuStatus()
 	return $menuStatus;
 
 }
-
 function setMenuDefaults()
 {
 	global $db;
@@ -115,7 +59,6 @@ function setMenuDefaults()
 	$query = "UPDATE ".TABLE_MOD." SET menu = '".MENU_ICON."&nbsp;".MODULE_NAME."' WHERE TITLE='".MODULE_NAME."'";
 	$db->sql_query($query);
 }
-
 function addMenuIcon()
 {
 	global $db;
@@ -192,11 +135,8 @@ function delMenuTitle()
  */
 function get_allies()
 {
-	global $db;
-
 	// Récupère la liste des alliances définies ds la table config.
-	$result = $db->sql_query("SELECT config_value FROM ".TABLE_CONFIG." WHERE config_name='tagRanking'");
-	list($allies) = $db->sql_fetch_row($result);
+	$allies = mod_get_option('tagRanking'); 
 
 	if ($allies=="")
 		return false;
@@ -210,6 +150,21 @@ function get_allies()
 		$allies_array = explode(",",$all);
 		return $allies_array;
 	}
+}
+
+function get_allies_for_where_sql_clause(){
+	
+	$allies = get_allies();
+	if( $allies != false){
+		$where_allies = " (ally='".mysql_real_escape_string($allies[0])."' ";
+		for ($i=1;$i<count($allies);$i++)
+			$where_allies .= " OR ally='".mysql_real_escape_string($allies[$i])."' "; 
+		$where_allies .=") ";
+		
+	}else{
+		$where_allies = false;	
+	}
+	return $where_allies;
 }
 //================================================================================
 //================================================================================
@@ -231,8 +186,8 @@ function page_footer()
 	$request = "SELECT version from ".TABLE_MOD." WHERE title='allyranking'";
 	$result = $db->sql_query($request,false);
 	list($version)=$db->sql_fetch_row($result);
-	echo "<br/><B>allyRanking v$version</B> - Jibus&copy;2006-2008<br/>";
-	echo '<B><div>Remise à jour pour OGSpy 3.0.7 </B> - Shad</div>';
+	echo "<br/><B>allyRanking v$version</B> - Jibus&copy;2006-2013<br/>";
+	echo '<B><div>Remise à jour pour OGSpy 3.1.2 </B> - DarkNoon</div>';
 }
 //================================================================================
 //================================================================================
@@ -253,21 +208,6 @@ function buttons_bar($subaction,$width=700)
 	echo "<table border='1' width='$width'>";
 	echo "<tr align='center'>";
 	echo "<td class='c'>&nbsp;</td>";
-	// ------------------------
-	// BOUTON "NOUVEAU RAPPORT"
-
-	if ($user_auth["server_set_ranking"] == 1 || $user_data["user_admin"] == 1)
-	{
-		if ($subaction == "report")
-			echo '<th width="150" style="vertical-align:middle;">'.$report_img.'<a>Nouveau rapport</a></th>'."\n";
-		else
-		{
-			echo '<td class="c" width="150" onclick="window.location = \'index.php?action=allyranking&subaction=report\';">'."\n";
-			echo '<a style="cursor:pointer">'.$report_img.'<font color="lime">Nouveau rapport</font></a>'."\n";
-			echo '</td>'."\n";
-		}
-	}
-
 	// ------------------------
 	//    BOUTON "CLASSEMENT"
 	if (($subaction == "ranking")||(!isset($subaction)))
@@ -309,96 +249,4 @@ function buttons_bar($subaction,$width=700)
 
 }
 
-//================================================================================
-//================================================================================
-function galaxy_getranking_members($lines,$ally,$attempt=0) {
-//-------------------------------------------------------------
-// Importation du classement interne de l'alliance et insertion
-// des enregistrements dans la table de classement des membres
-// TABLE_RANK_MEMBERS.
-
-	global $db;
-	global $user_data;
-	global $server_config;
-
-	if ($attempt == 5)
-	{
-		// Cinq fois la tentative d'insertion(appel récursif). Le timestamp reste a zéro. Il y a un pb
-		die("L'opération d'insertion ne peut aboutir. Timestamp = 0");
-	}
-
-	$time=0;
-	$time = time()-60*4;
-	if ($time > mktime(0,0,0) && $time < mktime(8,0,0)) $timestamp = mktime(0,0,0);
-	if ($time > mktime(8,0,0) && $time < mktime(16,0,0)) $timestamp = mktime(8,0,0);
-	if ($time > mktime(16,0,0) && $time < (mktime(0,0,0)+60*60*24)) $timestamp = mktime(16,0,0);
-
-	$files = array();
-	$OK = false;
-	$last_position = 0;
-	$index = 0;
-
-	for ($i=0 ; $i<sizeof($lines) ; $i++)
-	{
-		$line = trim($lines[$i]);
-
-
-		// Compatibilité Firefox.
-		//
-		// Le format des rapports varie entre IE et Firefox...
-		// Je remplace les tabs de firefox par des espaces
-		// et j'enlève les "Écrire un message"
-		$line = str_replace(".","",$line);
-		$line = str_replace("\t"," ",$line);
-		$line = str_replace("Écrire un message","Écrireunmessage",$line);
-
-
-		//Recherche de la ligne 0 du tableau
-
-		if (preg_match("#^Nom\s\sRang\sPlace\sCoords\sAdhésion\sOnline$#",$line))
-		{
-			$OK = true;
-			continue;
-		}
-
-		if ($OK)
-		{
-			$array_res = split("Écrireunmessage",$line);
-			$num_name = split(" ",$array_res[0]);
-			$name=$num_name[1];
-			// Si des espaces dans le nom...
-			for ($j=2;$j<count($num_name)-1;$j++)
-				$name .= " ".$num_name[$j];
-			$res = split(" ",substr($array_res[1],1,strpos($array_res[1],":")-3));
-			$num = count($res)-1;
-			$points = $res[count($res)-2];
-			if (intval($timestamp)!=0)
-			{
-				if(!is_numeric($num_name[0]))
-				{
-					$OK = false;
-				}
-				else
-				{
-					$request = "insert ignore ".TABLE_RANK_MEMBERS;
-					$request .= " (datadate, player, points, ally, sender_id)";
-					$request .= " values (".intval($timestamp).", '".mysql_real_escape_string($name)."', ".intval($points).", '".mysql_real_escape_string($ally)."',  ".$user_data["user_id"].")";
-					if ($name != "")
-						$db->sql_query($request,false);
-				}
-			}
-			else
-				//Nouvelle tentative
-				galaxy_getranking_members($lines,$ally,$attempt=0,$attempt++);
-		}
-	}
-
-	if ($server_config["debug_log"] == "1")
-	{
-		// Sauvegarde données tranmises
-		$nomfichier = PATH_LOG_TODAY.date("ymd_His")."_ID".$user_data["user_id"]."_ranking_".$datatype.".txt";
-		write_file($nomfichier, "w", $files);
-	}
-	redirection("index.php?action=".MODULE_ACTION."&subaction=ranking");
-}
 ?>

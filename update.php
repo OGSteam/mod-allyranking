@@ -12,14 +12,10 @@
 
 	global $db;
 
-	/**
-	 * Fichier de fonctions du module allyRanking
-	 */
-	require_once("mod/allyranking/ARinclude.php");
-	
-	// Enlever l'interclassement présent sur les versions précédentes si besoin.
-	$sql = 'ALTER TABLE '.TABLE_RANK_MEMBERS.' CHANGE `player` `player` VARCHAR(30) NOT NULL, CHANGE `ally` `ally` VARCHAR(30) NULL DEFAULT NULL'; 
-	$db->sql_query($sql,DEBUG,true);
+// Avant tout, faire le ménage pour que les requetes s'executent correctement !
+	$db->sql_query("DELETE FROM ".TABLE_MOD." WHERE title='allyranking'",DEBUG,true);
+	$db->sql_query("DROP TABLE IF EXISTS ".TABLE_RANK_MEMBERS,DEBUG,true);
+	$db->sql_query("DELETE FROM ".TABLE_CONFIG." WHERE config_name='tagRanking'",DEBUG,true);
 	
 	// Mettre à jour la version
 	$mod_folder = "allyranking";
