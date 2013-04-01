@@ -13,10 +13,12 @@
 	global $db;
 
 // Avant tout, faire le ménage pour que les requetes s'executent correctement !
+if( mysql_num_rows( mysql_query("SHOW TABLES LIKE '".$table_prefix.TABLE_MOD."'"))){
+
 	$db->sql_query("DELETE FROM ".TABLE_MOD." WHERE title='allyranking'",DEBUG,true);
 	$db->sql_query("DROP TABLE IF EXISTS ".TABLE_RANK_MEMBERS,DEBUG,true);
 	$db->sql_query("DELETE FROM ".TABLE_CONFIG." WHERE config_name='tagRanking'",DEBUG,true);
-	
+}
 	// Mettre à jour la version
 	$mod_folder = "allyranking";
 	$mod_name = "allyranking";
@@ -33,10 +35,7 @@ if( mysql_num_rows( mysql_query("SHOW TABLES LIKE '".$table_prefix."xtense_callb
   // on fait du nettoyage au cas ou
   $query = "DELETE FROM `".$table_prefix."xtense_callbacks"."` WHERE `mod_id`=".$ally_id;
   $db->sql_query($query);
-  // Insert les données pour récuperer les informations de la page Alliance
-  $query = "INSERT INTO ".$table_prefix."xtense_callbacks"." ( `mod_id` , `function` , `type` )
-				VALUES ( '".$ally_id."', 'ally_list', 'ally_list')";
-  $db->sql_query($query);
+
   }
 
 	?>

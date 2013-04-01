@@ -7,85 +7,36 @@
  *	modified	: 06/09/2006
  */
 	
+require_once("mod/allyranking/ARinclude.php");
 
-	// Fonctions d'affichage pour les labels des axes
-	function setDate($value) 
-	{
-		global $data_date;
-		return $data_date[$value];
-	}
 	
-	function setY($value) 
-	{
-		global $bot;
-		$value+=$bot;
-		if($value >= 1000) return round($value);
-		elseif($value >= 100) return round($value,1);
-		else return round($value,2);
-	}
+// Récupérer la liste des membres dont on veut voir les vals sur le graph...
+
+$in_list=" IN (";
+for ($nb=0;$nb<count($mblist);$nb++)
+{
+	$in_list .= "'".mysql_real_escape_string($mblist[$nb])."',"; 		
+}	
+$in_list = substr($in_list,0,strlen($in_list)-1).") ";
+//dbg($in_list);
 
 
-	/**
-	 * Fichier de fonctions du module allyRanking
-	 */
-	require_once("mod/allyranking/ARinclude.php");
 
-	/**
-	* Fichier des fonctions de la lib artichow
-	*/
-	
-	// Récupérer la liste des membres dont on veut voir les vals sur le graph...
-	$mblist = explode(",",$pub_mblist);	
-	if (isset($pub_mblist))
-	{
-		$in_list=" IN (";
-		for ($nb=0;$nb<count($mblist);$nb++)
-		{
-			$in_list .= "'".mysql_real_escape_string($mblist[$nb])."',"; 		
-		}	
-		$in_list = substr($in_list,0,strlen($in_list)-1).") ";
-		//dbg($in_list);
-	}	
-	
-	if ($pub_mblist=="")
-		$in_list = "=' IN (NULL) '";
-	
-	$allies = get_allies();
-
-	$case_clause="";	
-
-	if ($allies != false)
-	{			
-		//---------------------------------------------
-		// Préparer une clause where pour les alliances
-
-		$where_allies = " WHERE (ally='".mysql_real_escape_string($allies[0])."' ";
-		for ($i=1;$i<count($allies);$i++)
-			$where_allies .= " OR ally='".mysql_real_escape_string($allies[$i])."' "; 
-		$where_allies .=") ";
-
-		// Construction de la clause CASE WHEN d'ordonnancement des allies
-		$case_clause=" ,CASE a.ally";
-		for($i=0;$i<count($allies);$i++)
-		{
-			$case_clause .= " WHEN '".mysql_real_escape_string($allies[$i])."' THEN ".$i." ";
-		}
-		$case_clause .= " END case_val ";
-
-	}
+if ($mblist=="")
+	$in_list = "=' IN (NULL) '";
 	
 	
 	// Récupérer toutes les données des joueurs :
 	// Nom, date, points. (alliance a conserver pour correspondance couleur page detail.php
 //	dbg($pub_list);
-	$query = "SELECT datadate, player, points".$case_clause." FROM ".TABLE_RANK_PLAYER_POINTS." a where player ".$in_list." ORDER BY case_val,player,datadate";
+	$query = "SELECT datadate, player, points FROM ".TABLE_RANK_PLAYER_POINTS." a where player ".$in_list." ORDER BY player,datadate";
 
 	$result = $db->sql_query($query,false,true);
 	if ($db->sql_numrows($result) != 0 )
 	{
 		$min_points = NULL;
 		$max_points = NULL;
-		while (list($datadate,$player,$points,$ally)=$db->sql_fetch_row($result))
+		while (list($datadate,$player,$points)=$db->sql_fetch_row($result))
 		{
 			// Récupérer toutes les dates distinctes,ordonnées
 			// echo ( (((int) (($datadate*4)/(3600*8)))/4)*3600*8 ."<BR>");
@@ -114,7 +65,7 @@
 
 		$nbdates   = sizeof($merge);
 		$nbmembers = sizeof($members);
-
+		
 
 		// Construire les datas pour chaque membre	
 		// Pour chaque date, pour chaque joueur, trouver le nombre de points
@@ -124,11 +75,27 @@
 			{
 				$dat  = $merge[$i];
 				$memb = $members[$j];
-				$clsmt[$memb][$dat] = isset($clsmt[$memb][$dat]) ? $clsmt[$memb][$dat] : NULL;
+
+				//$clsmt_prepare = isset($clsmt[$memb][$dat]) ? $clsmt[$memb][$dat] : NULL;
+				if(isset($clsmt[$memb][$dat]))
+					$ranking[$j][] = "[" .($dat * 1000). ", " . $clsmt[$memb][$dat] . "]";
 			}
 		}
 
-print_r($clsmt);
+	// On créé le graphique
+
+	foreach($members as $key => $member){
+		$data[$member] = $ranking[$key]; // Valeur des séries
+		$names[] = $member; // Nom des séries
+	}
+
+	global $zoom;
+	$zoom = "true";
+
+	$curve = create_multi_curve('Comparaison','Points',$data,$names,'curve_evol_details');
+	echo $curve;
+	
+	}
 ?>
 
 

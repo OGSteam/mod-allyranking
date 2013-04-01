@@ -222,11 +222,11 @@ function buttons_bar($subaction,$width=700)
 	// ------------------------
 	//     BOUTON "DETAILS"
 	if ($subaction == "detail")
-		echo '<th width="150" style="vertical-align:middle;">'.$detail_img.'<a>Détails</a></th>'."\n";
+		echo '<th width="150" style="vertical-align:middle;">'.$detail_img.'<a>Comparer</a></th>'."\n";
 	else
 	{
 		echo '<td class="c" width="150" onclick="window.location = \'index.php?action=allyranking&subaction=detail\';">'."\n";
-		echo '<a style="cursor:pointer">'.$detail_img.'<font color="lime">Détails</font></a>'."\n";
+		echo '<a style="cursor:pointer">'.$detail_img.'<font color="lime">Comparer</font></a>'."\n";
 		echo '</td>'."\n";
 	}
 

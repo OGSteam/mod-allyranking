@@ -1,5 +1,4 @@
 <?php
-
 /**
  *	detail.php Page du graphique d'évolution détaillé
  *	@package	allyRanking
@@ -7,10 +6,7 @@
  *	created	: 18/08/2006   
  *	modified	: 06/09/2006
  */
-
-/**
- * Fichier de fonctions du module allyRanking
- */
+if (!defined('IN_SPYOGAME')) die("Hacking attempt");
  ?>
 <SCRIPT LANGUAGE="JavaScript">
 <!-- Begin
@@ -45,11 +41,11 @@ require_once("mod/allyranking/ARinclude.php");
 //define("DEBUG",true);
 
 	global $in_list;
-	if (!defined('IN_SPYOGAME')) die("Hacking attempt");
+
 if (!isset($pub_memberslist)) $pub_memberslist = array();
 	if (count($pub_memberslist))
 	{	
-		$mblist = implode(",",$pub_memberslist);
+		$mblist = $pub_memberslist;
 	}
 
 	// Affichage des boutons de navigation
@@ -57,32 +53,20 @@ if (!isset($pub_memberslist)) $pub_memberslist = array();
 
 	$allies = get_allies();
 
-	if ($allies != false)
-	{			
-		//---------------------------------------------
-		// Préparer une clause where pour les alliances
-
-		$where_allies = " WHERE (ally='".mysql_real_escape_string($allies[0])."' ";
-		for ($i=1;$i<count($allies);$i++)
-			$where_allies .= " OR ally='".mysql_real_escape_string($allies[$i])."' "; 
-		$where_allies .=") ";
-	}
-
-	
 
 	$detail48_img  = '<img width="48" height="48" SRC="mod/allyranking/images/detail48.png" name="detail48" align="absmiddle" style="behavior: url(\'mod/allyranking/images/pngbehavior.htc\');">'; 
 
 	echo "<BR/><table width='810'>\n";
 	echo "\t<tr><td class='c' width='50'>".$detail48_img."</td><td class='c' width='750'>Evolution générale - Détail par membre</td></tr>\n";
-	echo "\t<tr><th colspan='2'>";
-	if (count($pub_memberslist))
-		echo "<img src='index.php?action=allyranking&subaction=graphicglobal&mblist=$mblist'/>";
-	else
+	echo "\t<tr><th colspan='2' id='curve_evol_details'>";
+	if (count($pub_memberslist)){
+		include('./mod/allyranking/graphic_curve_global.php');		
+	}else
 		echo "Choisissez des joueurs dont vous voulez visualiser la progression";
 	echo "</th> \n";
 	echo "</tr>\n </table>\n";
 	
-	$result = $db->sql_query("SELECT COUNT(DISTINCT player),ally FROM ".TABLE_RANK_PLAYER_POINTS." ".$where_allies." GROUP BY ally");
+	$result = $db->sql_query("SELECT COUNT(DISTINCT player),ally FROM ".TABLE_RANK_PLAYER_POINTS." WHERE ".get_allies_for_where_sql_clause()." GROUP BY ally");
 	
 	
 	//--------------------------------
@@ -125,24 +109,10 @@ if (!isset($pub_memberslist)) $pub_memberslist = array();
 			echo "\t\t\t\t\t<input type='checkbox' value='$player' name='memberslist[]' id='$player'";
 			if (count($pub_memberslist)!=0)
 				echo (array_search($player,$pub_memberslist)!==false?" checked ":"");
-			echo " >\n";
+			echo " >$player\n";
 			echo "\t\t\t\t</td>\n"
-				."\t\t\t\t";
-
-			echo "<td><table width='20' heigth='10'><tr><td border='1' ";
-			if (count($pub_memberslist)!=0)
-			{
-				if (array_search($player,$pub_memberslist)!==false)
-				{
-					$indice = $color % (sizeof($tabColors)-1) ;
-					echo "bgcolor=\"".$tabColors[$indice]."\"";
-					$color++;
-				}
-			}
-
-			echo ">&nbsp;</td></tr></table></td>\n\t\t\t\t<td width='100%'>\n";
-			echo "\t\t\t\t\t<label for='$player'>$player";				
-			echo "</label>\n"."\t\t\t\t</td></tr>\n\t\t\t</table>\n";
+				."\t\t\t\t";		
+			echo "\t\t\t\t</tr>\n\t\t\t</table>\n";
 			if (!($j++%6))
 			{
 				echo ("\t\t</th>\n\t\t<th align='left' valign='top' width='150'>\n");

@@ -9,33 +9,24 @@
 /**
  * Fichier de fonctions du module allyRanking
  */
-//require_once("mod/allyranking/ARinclude.php");
-
-//define("DEBUG",false);
-
-	global $pub_show_delta, $pub_show_top1500, $pub_show_bbcode;
-
-	if (!$pub_show_top1500)
-	{
-		$pub_show_delta = false;
-	}
+	global $pub_show_bbcode;
 
 //================================================================================
 //================================================================================
 function ARtableau_options()
 {
-	global $pub_show_delta, $pub_show_top1500, $pub_show_tabtext, $pub_mode;
+	global $pub_show_tabtext, $pub_mode;
 	?>
 		<tr>
 			<td class='c' colspan='2'>Options d'affichage</td>
 		</tr>
-		<tr>
+		<!--<tr>
 			<th>Affichage des résultats des alliances :</th>
 			<th>
 				<INPUT TYPE="radio" name="mode" value="fusion" onclick="this.form.submit();" <?php if (!isset($pub_mode)||$pub_mode=="fusion") echo "CHECKED";?> > Fusionner les classements 				
 				<INPUT TYPE="radio" name="mode" value="sorted" onclick="this.form.submit();" <?php if ($pub_mode=="sorted") echo "CHECKED";?>> Séparer les classements
 			</th>
-		</tr>
+		</tr>-->
 		<tr>
 			<th>Afficher le classement en tableau texte</th>
       <th><input type='checkbox' name='show_tabtext' value='true' onclick='this.form.submit();' <?php if ($pub_show_tabtext==true) echo "CHECKED";?> ></th>
@@ -116,18 +107,13 @@ function ARtable_header($ally=null){
 	//--------
 	// Ligne 1
 	
-	if (isset($ally)) echo "<tr><td class='c'colspan='6'>Alliance <font color='lime'>$ally</font></td></tr> ";
-	echo "<tr><td class='c' colspan='5'>Classement interne</td>";
-	if ($pub_show_top1500)	echo "<td class='c' colspan='2'>TOP 1500</td>";
-	if ($pub_show_delta) 	echo "<td class='c'>&nbsp;</td>";
-	echo "<td class='c'>&nbsp;</td></tr>";
+	echo "<tr><td class='c' colspan='8'>Classement</td>";
 	
 	//--------
 	// Ligne 2
 	
-	echo "<tr><td class='c'>Rang</td><td class='c'>Joueur</td><td class='c'>Alliance</td><td class='c'>Points</td><td class='c'>Date rapport</td>";
-	echo "<td class='c'>Rang</td><td class='c'>Date rapport</td>";
-	echo "<td class='c'>Graph</td></tr>";
+	echo "<tr><td class='c'>Rang</td><td class='c'>Rang Jeu</td><td class='c'>Joueur</td><td class='c'>Alliance</td><td class='c'>Points</td><td class='c'>Date rapport</td>";
+
 }
 
 /**																	
@@ -144,19 +130,16 @@ function ARtable_header_tabtxt($ally=null){
 	// Ligne 1
 	
 	if (isset($ally)) {$bb = "[    Alliance    $ally    ]\n<br>";}else{ $bb="";}
-	$bb .= "[                              Classement interne                              ]";
-	$bb .= "[        TOP 1500        ]";
+	$bb .= "[                              Classement interne                                        ]";
 	$bb .="\n<br>";
 	//--------
 	// Ligne 2
 	
-	$bb .= "[ Rang |        Joueur        |    Alliance     |   Points   |   Date rapport  ]";
-	$bb .= "[ Rang |   Date rapport  ]";
+	$bb .= "[ Rang |      Joueur          |    Alliance     |   Points   |   Date rapport | Rang Jeu ]";
 	$bb .= "\n<br>";
 	$bb = str_replace(" ","&nbsp;",$bb);
 
-	$bb .= "[------------------------------------------------------------------------------]";
-	$bb .= "[------------------------]";
+	$bb .= "[----------------------------------------------------------------------------------------]";
 	$bb .="\n<br>";
 
 	echo $bb;
@@ -259,10 +242,6 @@ function ARgalaxy_show_ranking_members($sortmode){
 		{
 			// Classement général trans alliances
 			$order_clause = " ORDER BY points DESC ";
-			
-					
-			// Remplacer la requete pour compatibilité MySQL<4.1
-			// Trouver la liste des joueurs de TABLE_RANK_MEMBERS pour la where_clause définie
 
 			echo "<table width='700'>\n";				
 			ARtable_header();
@@ -276,49 +255,34 @@ function ARgalaxy_show_ranking_members($sortmode){
 			{
 				$rang++;	
 				
-				if ($pub_show_top1500)
+				// Chercher si un eventuel classement général pour ce joueur
+				$result1 = $db->sql_query("SELECT MAX(datadate) FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='$player'");
+				list($datadate2) = $db->sql_fetch_row($result1);
+				
+				// Si trouvé récupérer les valeurs
+				if ($datadate2!=NULL)
 				{
-					// Chercher si un eventuel classement général pour ce joueur
-					// Date du dernier classement TOP1500 de ce joueur :
-					$result1 = $db->sql_query("SELECT MAX(datadate) FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='$player'");
-					list($datadate2) = $db->sql_fetch_row($result1);
-					
-					// Si trouvé récupérer les valeurs
-					if ($datadate2!=NULL)
-					{
-						
-						// dbg("Max date trouvé : $maxdate");
-						$request = " SELECT rank FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='$player' and datadate=$datadate2";
-						$result1 = $db->sql_query($request);
-						list($rank) = $db->sql_fetch_row($result1);
-						$delta = abs($datadate - $datadate2);
-					}
-					else
-					{
-						$datadate2="";
-						$rank="&nbsp;";
-						$delta = "&nbsp;";
-					}
+					$request = " SELECT rank FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='$player' and datadate=$datadate2";
+					$result1 = $db->sql_query($request);
+					list($rank) = $db->sql_fetch_row($result1);
+				}
+				else
+				{
+					$rank="&nbsp;";
 				}
 				
-				$dd = strftime("%d %b %Y %Hh", $datadate);		
-
-					if ($datadate2 != '') 
-						$dd2 = strftime("%d %b %Y %Hh", $datadate2);
-					else
-						$dd2 = '&nbsp;';
-					
-					$delta = prec_time((int)$delta);
 				
-					
+				$dd = strftime("%d %b %Y %Hh", $datadate);		
+		
 				echo "<tr>\n";
 				echo "\t<th>$rang</th>"
+					."<th>$rank</th>\n"
 					."<th><a href='index.php?action=search&type_search=player&string_search=$player&strict=on'>$player</a></th>"
 					."<th><a href='index.php?action=search&type_search=ally&string_search=$ally&strict=on'>$ally</a></th>"
 					."<th>".number_format("$points",0,'','.')."</th>"
 					."<th>$dd</th>\n";
 				
-				echo "<th>$rank</th><th>$dd2</th>\n";
+				
 
 				echo "\t<th>\n"
 					."\t\t<a href='index.php?action=".MODULE_ACTION."&subaction=ranking&date=$datadate&member=$player'>\n"
@@ -328,86 +292,10 @@ function ARgalaxy_show_ranking_members($sortmode){
 				echo "</tr>\n";	
 			}			
 
-			echo "<tr><td class='c' colspan='6'>&nbsp;</td></tr>";
+			echo "<tr><td class='c' colspan='8'>&nbsp;</td></tr>";
 			echo "</table>";
 			//dbg ("($sortmode,$pub_date) - $request<br>");
 		
-		}
-		else if (($sortmode == "sorted")&&(!$nothing_to_do))
-		{
-			
-			// Construction de la clause CASE WHEN d'ordonnancement des allies
-			$case_clause=" ,CASE a.ally";
-			for($i=0;$i<count($allies);$i++)
-			{
-				$case_clause .= " WHEN '".mysql_real_escape_string($allies[$i])."' THEN ".$i." ";
-			}
-			$case_clause .= " END case_val ";
-			$order_clause = " ORDER BY case_val, points DESC ";
-
-
-			echo "<table width='700'>\n";
-
-			$query = "SELECT a.player,a.ally,a.points,a.datadate ".$case_clause." FROM ".TABLE_RANK_PLAYER_POINTS." a WHERE ".$where_clause.$order_clause;
-			$result = $db->sql_query($query,false,false);
-
-			// Corps du tableau
-			$rang = 0;
-			$lastally='';
-			while(list($player,$ally,$points,$datadate) = $db->sql_fetch_row($result))
-			{				
-				if ($lastally != $ally)
-				{
-					ARtable_header($ally);
-					$lastally = $ally;
-					$rang = 0;
-				}
-
-				$rang++;	
-			
-				if ($pub_show_top1500)
-				{
-					// Chercher si un eventuel classement général pour ce joueur
-					// Date du dernier classement TOP1500 de ce joueur :
-					$result1 = $db->sql_query("SELECT MAX(datadate) FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='$player'");
-					list($datadate2) = $db->sql_fetch_row($result1);
-					
-					// Si trouvé récupérer les valeurs
-					if ($datadate2!=NULL)
-					{
-						
-						// dbg("Max date trouvé : $maxdate");
-						$request = " SELECT rank FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='$player' and datadate=$datadate2";
-						$result1 = $db->sql_query($request);
-						list($rank) = $db->sql_fetch_row($result1);
-						$delta = abs($datadate - $datadate2);
-					}
-					else
-					{
-						$datadate2="";
-						$rank="&nbsp;";
-						$delta = "&nbsp;";
-					}
-				}	
-
-				$dd = strftime("%d %b %Y %Hh", $datadate);		
-
-				echo "<tr>\n";
-				echo "\t<th>$rang</th>"
-					."<th><a href='index.php?action=search&type_search=player&string_search=$player&strict=on'>$player</a></th>"
-					."<th><a href='index.php?action=search&type_search=ally&string_search=$ally&strict=on'>$ally</a></th>"
-					."<th>$points</th>"
-					."<th>$dd</th>\n";
-
-				echo "\t<th>\n"
-					."\t\t<a href='index.php?action=".MODULE_ACTION."&subaction=ranking&date=$datadate&mode=$sortmode&member=$player'>\n"
-					."\t\t\t<img src='mod/".MODULE_DIR."/images/graph_icon16.gif'>\n"
-					."\t\t</a>\n"
-					."\t</th>\n";		
-				echo "</tr>\n";			
-			}
-			echo "<tr><td class='c' colspan='6'>&nbsp;</td></tr>";
-			echo "</table>";
 		}
 	}
 	else
@@ -563,7 +451,7 @@ function ARgalaxy_show_ranking_members_tabtxt($sortmode){
 				if (!isset($bb)) {$bb="";}
 				$bb .= "[ $disprang | $dispplayer | $dispally | $disppoints | $dd ]";				
 
-				$bb .= "[ $disprank | $dd2 ]";
+				$bb .= "[  $disprank  ]";
 				
 				$bb .= "\n<br>";
 			}	
@@ -572,108 +460,6 @@ function ARgalaxy_show_ranking_members_tabtxt($sortmode){
 			echo "</td></tr></table>";
 			//dbg ("($sortmode,$pub_date) - $request<br>");
 			
-		}
-		else if (($sortmode == "sorted")&&(!$nothing_to_do))
-		{
-			
-			// Construction de la clause CASE WHEN d'ordonnancement des allies
-			$case_clause=" ,CASE a.ally";
-			for($i=0;$i<count($allies);$i++)
-			{
-				$case_clause .= " WHEN '".mysql_real_escape_string($allies[$i])."' THEN ".$i." ";
-			}
-			$case_clause .= " END case_val ";
-			$order_clause = " ORDER BY case_val, points DESC ";
-
-
-			echo "<table width='700'>\n";
-
-			$query = "SELECT a.player,a.ally,a.points,a.datadate ".$case_clause." FROM ".TABLE_RANK_PLAYER_POINTS." a WHERE ".$where_clause.$order_clause;
-			$result = $db->sql_query($query,false,false);
-
-			// Corps du tableau
-			$rang = 0;
-			$lastally="";
-			
-			
-			
-			while(list($player,$ally,$points,$datadate) = $db->sql_fetch_row($result))
-			{		
-									
-				if ($lastally != $ally)
-				{
-					if ($lastally <>"")
-						echo "</td></tr></table>";
-					echo "<table><tr><td class='f'><font face='courier new'>";
-					ARtable_header_tabtxt($ally);
-					$lastally = $ally;
-					$rang = 0;
-				}
-
-				$rang++;	
-			
-				// Chercher si un eventuel classement général pour ce joueur
-				// Date du dernier classement TOP1500 de ce joueur :
-				$result1 = $db->sql_query("SELECT MAX(datadate) FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='$player'");
-				list($datadate2) = $db->sql_fetch_row($result1);
-				
-				// Si trouvé récupérer les valeurs
-				if ($datadate2!=NULL)
-				{
-					// dbg("Max date trouvé : $maxdate");
-					$request = " SELECT rank FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='$player' and datadate=$datadate2";
-					$result1 = $db->sql_query($request);
-					list($rank) = $db->sql_fetch_row($result1);
-					$delta = abs($datadate - $datadate2);
-				}
-				else
-				{
-					//$datadate2="-- --- ---- ---";
-					$rank="----";	
-				}
-				
-
-				$dd = strftime("%d %b %Y %Hh", $datadate);		
-				
-				if ($datadate2 != '')  
-						{$dd2 = strftime("%d %b %Y %Hh", $datadate2);}
-					else
-						{$dd2 = '-- --- ---- ---';}
-					
-					$delta = prec_time((int)$delta);	
-				
-				
-				// Rang sur 4 caractères
-				$disprang = substr($blank,1,4-strlen($rang)).$rang;
-				
-				// Joueur sur 20 caractères
-				$dispplayer = substr($player,0,19);
-				$dispplayer = substr($blank,1,(20-strlen($dispplayer))/2).$dispplayer.substr($blank,1,(20-strlen($dispplayer))/2);
-				if (strlen($dispplayer)<20) $dispplayer .=" ";
-				
-				// Alliance sur 15 caractères
-				$dispally = substr($ally,0,14);
-				$dispally = substr($blank,1,(15-strlen($dispally))/2).$dispally.substr($blank,1,(15-strlen($dispally))/2);
-				if (strlen($dispally)<15) $dispally .=" ";
-
-				//Points sur 8 caractères
-				$disppoints = substr($blank,1,8-strlen($points)).$points;
-				
-				// Rang sur 4 caractères
-				$disprank = substr($blank,1,4-strlen($rank)).$rank;
-				if (!isset($bb)) {$bb="";}
-				$bb .= "[ $disprang | $dispplayer | $dispally | $disppoints | $dd ]";				
-				if ($pub_show_top1500){
-					$bb .= "[ $disprank | $dd2 ]";
-				}
-				
-				$bb .= "\n<br>";
-				$bb = str_replace(" ","&nbsp;",$bb);
-				echo $bb;
-				$bb ="";
-			}
-			
-			echo "</td></tr></table>";
 		}
 		
 	}

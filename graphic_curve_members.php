@@ -38,9 +38,9 @@ $result = $db->sql_query($request, false, false);
 while (list($player_name, $datadate, $score) = $db->sql_fetch_row($result)) {
 	switch(strtolower($player_name)) {
 		case strtolower($player) :
-		//$ranking_1[] = $score;
+
 		$ranking_1[] = "[" .($datadate * 1000). ", " . $score . "]";
-		//$dates[] = $datadate;
+
 		break;
 		case strtolower($player_comp) :
 		$ranking_2[$datadate] = $score;
