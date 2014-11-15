@@ -1,6 +1,6 @@
 <?php
 /**
- *	allyRankingMain.php Page d'accès au module allyRanking
+ *	allyRankingMain.php Page d'accÃ¨s au module allyRanking
  *	@package	allyRanking
  *	@author		Jibus 
  *	created	: 18/08/2006   
@@ -12,10 +12,10 @@ if (!defined('IN_SPYOGAME')) die("Hacking attempt");
 $query = "SELECT `active` FROM `".TABLE_MOD."` WHERE `action`='allyranking' AND `active`='1' LIMIT 1";
 if (!$db->sql_numrows($db->sql_query($query))) die("Hacking attempt");
 
-// définition de la variable si inexistante (notice)
+// dÃ©finition de la variable si inexistante (notice)
 if (!isset($pub_subaction)) $pub_subaction = 'ranking';
 
-// Placer ici l'appel pour graphiques pour éviter problème de header
+// Placer ici l'appel pour graphiques pour Ã©viter problÃ¨me de header
 switch ($pub_subaction)
 {
 	//

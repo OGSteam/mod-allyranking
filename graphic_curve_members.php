@@ -1,6 +1,6 @@
 <?php
 /**
- *	graphic_curve_members.php Génération du graphique d'évolution d'un joueur
+ *	graphic_curve_members.php GÃ©nÃ©ration du graphique d'Ã©volution d'un joueur
  *	@package	allyRanking
  *	@author		Jibus sur la base du travail de ben.12
  */
@@ -24,7 +24,7 @@ if (!check_var($pub_member, "Text")) {
 $player = $pub_member;
 
 
-//on recupère le classement
+//on recupÃ¨re le classement
 $ranking_1 = array();
 $dates = array();
 
@@ -48,7 +48,7 @@ while (list($player_name, $datadate, $score) = $db->sql_fetch_row($result)) {
 	}
 }
 
-// On créé le graphique
+// On crÃ©Ã© le graphique
 
 //create_multi_curve($titre, $sous_titre, $data, $names, $conteneur)
 

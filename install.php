@@ -20,6 +20,6 @@ if ($is_ok == true)
 	}
 else
   {
-  echo  "<script>alert('Désolé, un problème a eu lieu pendant l'installation, corrigez les problèmes survenue et réessayez.');</script>";
+  echo  "<script>alert('DÃ©solÃ©, un problÃ¨me a eu lieu pendant l'installation, corrigez les problÃ¨mes survenue et rÃ©essayez.');</script>";
   }
 ?>

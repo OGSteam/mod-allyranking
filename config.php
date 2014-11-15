@@ -73,7 +73,7 @@ buttons_bar($pub_subaction);
 function valid()
 {
 	if (document.form1.delMember.value!="")
-		return confirm("Voulez-vous supprimer définitivement tous les classements alliance de "+document.form1.delMember.value);
+		return confirm("Voulez-vous supprimer dÃ©finitivement tous les classements alliance de "+document.form1.delMember.value);
 	else
 		return true;
 }
@@ -99,7 +99,7 @@ function valid()
 			<td class="c" colspan="2">Gestion des alliances </td>
 		</tr>
 		<tr align="center">
-			<th>Liste des alliances à utiliser (séparées par des virgules)</th>
+			<th>Liste des alliances Ã  utiliser (sÃ©parÃ©es par des virgules)</th>
 			<th>
 				<input type="text" name="tagRanking" rows="1" cols="10"
 				<?php

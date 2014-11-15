@@ -1,6 +1,6 @@
 <?php
 /**
- *	detail.php Page du graphique d'évolution détaillé
+ *	detail.php Page du graphique d'Ã©volution dÃ©taillÃ©
  *	@package	allyRanking
  *	@author		Jibus 
  *	created	: 18/08/2006   
@@ -57,7 +57,7 @@ if (!isset($pub_memberslist)) $pub_memberslist = array();
 	$detail48_img  = '<img width="48" height="48" SRC="mod/allyranking/images/detail48.png" name="detail48" align="absmiddle" style="behavior: url(\'mod/allyranking/images/pngbehavior.htc\');">'; 
 
 	echo "<BR/><table width='810'>\n";
-	echo "\t<tr><td class='c' width='50'>".$detail48_img."</td><td class='c' width='750'>Evolution générale - Détail par membre</td></tr>\n";
+	echo "\t<tr><td class='c' width='50'>".$detail48_img."</td><td class='c' width='750'>Evolution gÃ©nÃ©rale - DÃ©tail par membre</td></tr>\n";
 	echo "\t<tr><th colspan='2' id='curve_evol_details'>";
 	if (count($pub_memberslist)){
 		include('./mod/allyranking/graphic_curve_global.php');		

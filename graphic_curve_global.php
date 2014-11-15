@@ -10,7 +10,7 @@
 require_once("mod/allyranking/ARinclude.php");
 
 	
-// Récupérer la liste des membres dont on veut voir les vals sur le graph...
+// RÃ©cupÃ©rer la liste des membres dont on veut voir les vals sur le graph...
 
 $in_list=" IN (";
 for ($nb=0;$nb<count($mblist);$nb++)
@@ -26,7 +26,7 @@ if ($mblist=="")
 	$in_list = "=' IN (NULL) '";
 	
 	
-	// Récupérer toutes les données des joueurs :
+	// RÃ©cupÃ©rer toutes les donnÃ©es des joueurs :
 	// Nom, date, points. (alliance a conserver pour correspondance couleur page detail.php
 //	dbg($pub_list);
 	$query = "SELECT datadate, player, points FROM ".TABLE_RANK_PLAYER_POINTS." a where player ".$in_list." ORDER BY player,datadate";
@@ -38,7 +38,7 @@ if ($mblist=="")
 		$max_points = NULL;
 		while (list($datadate,$player,$points)=$db->sql_fetch_row($result))
 		{
-			// Récupérer toutes les dates distinctes,ordonnées
+			// RÃ©cupÃ©rer toutes les dates distinctes,ordonnÃ©es
 			// echo ( (((int) (($datadate*4)/(3600*8)))/4)*3600*8 ."<BR>");
 			$datadate = (((int) (($datadate*4)/(3600*8)))/4)*3600*8;
 			$dates[]   = $datadate;
@@ -48,15 +48,15 @@ if ($mblist=="")
 		}
 
 		// A la sortie de boucle, virer les doublons dans la table des dates et des membres
-		// et réindicer les tableaux à partir de zéro
+		// et rÃ©indicer les tableaux Ã  partir de zÃ©ro
 		$dates 	 = array_slice(array_unique ($dates),0);
 		$members = array_slice(array_unique ($members),0);
 
-		// déterminer le nombre d'intervalles de 8h entre les dates min et max, 
-		// puis l'arondir à l'unité au dessus
+		// dÃ©terminer le nombre d'intervalles de 8h entre les dates min et max, 
+		// puis l'arondir Ã  l'unitÃ© au dessus
 		$nbdates = ceil((max($dates) - min($dates)) / (60*60*8))+1;
 
-		// Créer un tableau des intervalles de dates entre datemin et datemax
+		// CrÃ©er un tableau des intervalles de dates entre datemin et datemax
 		for ($i=0; $i<$nbdates; $i++) 
 		{
 			$curdate = min($dates) + (60*60*8*$i);  
@@ -82,11 +82,11 @@ if ($mblist=="")
 			}
 		}
 
-	// On créé le graphique
+	// On crÃ©Ã© le graphique
 
 	foreach($members as $key => $member){
-		$data[$member] = $ranking[$key]; // Valeur des séries
-		$names[] = $member; // Nom des séries
+		$data[$member] = $ranking[$key]; // Valeur des sÃ©ries
+		$names[] = $member; // Nom des sÃ©ries
 	}
 
 	global $zoom;

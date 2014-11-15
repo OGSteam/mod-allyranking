@@ -21,10 +21,10 @@ function ARtableau_options()
 			<td class='c' colspan='2'>Options d'affichage</td>
 		</tr>
 		<!--<tr>
-			<th>Affichage des résultats des alliances :</th>
+			<th>Affichage des rÃ©sultats des alliances :</th>
 			<th>
 				<INPUT TYPE="radio" name="mode" value="fusion" onclick="this.form.submit();" <?php if (!isset($pub_mode)||$pub_mode=="fusion") echo "CHECKED";?> > Fusionner les classements 				
-				<INPUT TYPE="radio" name="mode" value="sorted" onclick="this.form.submit();" <?php if ($pub_mode=="sorted") echo "CHECKED";?>> Séparer les classements
+				<INPUT TYPE="radio" name="mode" value="sorted" onclick="this.form.submit();" <?php if ($pub_mode=="sorted") echo "CHECKED";?>> SÃ©parer les classements
 			</th>
 		</tr>-->
 		<tr>
@@ -35,8 +35,8 @@ function ARtableau_options()
 }
 
 /**
- * Génère le bloc de selection de dates de la page Classement et inclu le bloc d'options de classement.
- * @param string $wa Clause WHERE pour la sélection des alliances.
+ * GÃ©nÃ¨re le bloc de selection de dates de la page Classement et inclu le bloc d'options de classement.
+ * @param string $wa Clause WHERE pour la sÃ©lection des alliances.
  */
 function ARpage_top_block()
 {
@@ -94,7 +94,7 @@ function ARpage_top_block()
 
 
 /**																	
- * Génère les entêtes du tableau de classement				
+ * GÃ©nÃ¨re les entÃªtes du tableau de classement				
  * @param string $ally nom de l'alliance pour cas "sorted	"	
  */
 function ARtable_header($ally=null){
@@ -117,7 +117,7 @@ function ARtable_header($ally=null){
 }
 
 /**																	
- * Génère les entêtes du tableau de classement en BBCode				
+ * GÃ©nÃ¨re les entÃªtes du tableau de classement en BBCode				
  * @param string $ally nom de l'alliance pour cas "sorted	"	
  */
 function ARtable_header_tabtxt($ally=null){
@@ -147,7 +147,7 @@ function ARtable_header_tabtxt($ally=null){
 
 
 /**																			
- * Génère le bloc d'affichage du graphique d'évolution de membre	
+ * GÃ©nÃ¨re le bloc d'affichage du graphique d'Ã©volution de membre	
  */	
 function ARevo_member(){
 
@@ -155,7 +155,7 @@ function ARevo_member(){
 	global $pub_member;
 	
 	//--------------------------------------------
-	// Déterminer les bornes de date pour le graph
+	// DÃ©terminer les bornes de date pour le graph
 	
 	$query = "SELECT MIN(datadate), MAX(datadate) FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='".mysql_real_escape_string($pub_member)."' GROUP BY player";
 	$result = $db->sql_query($query);
@@ -176,7 +176,7 @@ function ARevo_member(){
 
 
 /**																		
- * Génère l'ensemble de la page de classement en fn° du mode		
+ * GÃ©nÃ¨re l'ensemble de la page de classement en fnÂ° du mode		
  * @param string $sortmode accepte deux valeurs : "fusion","sorted" 	
  */
 function ARgalaxy_show_ranking_members($sortmode){
@@ -186,7 +186,7 @@ function ARgalaxy_show_ranking_members($sortmode){
 	$pub_show_delta   = (bool) $pub_show_delta;
 
 	//---------------------------------
-	// Récupérer la liste des alliances
+	// RÃ©cupÃ©rer la liste des alliances
 	
 	$case_clause = "";
 	$order_clause = "";
@@ -204,7 +204,7 @@ function ARgalaxy_show_ranking_members($sortmode){
 	
 			//-------------------------------------------------
 			// Trouver la date max de chaque rapport d'alliance
-			// et générer la requete par morceaux la requete de
+			// et gÃ©nÃ©rer la requete par morceaux la requete de
 			// classement des alliances
 			
 			$request = "SELECT ally,MAX(datadate) AS maxdate FROM ".TABLE_RANK_PLAYER_POINTS." WHERE ".get_allies_for_where_sql_clause()." GROUP BY ally"; 
@@ -221,7 +221,7 @@ function ARgalaxy_show_ranking_members($sortmode){
 					$b = intval($maxdate);
 					$where_clause .= " OR (a.ally='".$a."' AND a.datadate=".$b.")";				
 				}
-				// On dégage le 1er OR
+				// On dÃ©gage le 1er OR
 				$where_clause = substr($where_clause,3)." ";
 			}
 			else
@@ -232,7 +232,7 @@ function ARgalaxy_show_ranking_members($sortmode){
 		else
 		{
 			//--------------------------------------------------
-			// L'utilisateur veut les rapports d'une date donnée
+			// L'utilisateur veut les rapports d'une date donnÃ©e
 
 			$where_clause = get_allies_for_where_sql_clause() . " AND a.datadate = ".$pub_date." "; 			
 		}
@@ -240,7 +240,7 @@ function ARgalaxy_show_ranking_members($sortmode){
 		//-------------------------------------------------
 		if (($sortmode == "fusion")&&(!$nothing_to_do))
 		{
-			// Classement général trans alliances
+			// Classement gÃ©nÃ©ral trans alliances
 			$order_clause = " ORDER BY points DESC ";
 
 			echo "<table width='700'>\n";				
@@ -255,11 +255,11 @@ function ARgalaxy_show_ranking_members($sortmode){
 			{
 				$rang++;	
 				
-				// Chercher si un eventuel classement général pour ce joueur
+				// Chercher si un eventuel classement gÃ©nÃ©ral pour ce joueur
 				$result1 = $db->sql_query("SELECT MAX(datadate) FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='$player'");
 				list($datadate2) = $db->sql_fetch_row($result1);
 				
-				// Si trouvé récupérer les valeurs
+				// Si trouvÃ© rÃ©cupÃ©rer les valeurs
 				if ($datadate2!=NULL)
 				{
 					$request = " SELECT rank FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='$player' and datadate=$datadate2";
@@ -302,9 +302,9 @@ function ARgalaxy_show_ranking_members($sortmode){
 	{
 		?>
 		<table width='700'>
-			<tr><td class="c">Visualisation des résultats impossible</td></tr>
+			<tr><td class="c">Visualisation des rÃ©sultats impossible</td></tr>
 			<tr>
-			<th><br>Le module n'est pas configuré : La liste des alliances est vide.<br>&nbsp;</th>
+			<th><br>Le module n'est pas configurÃ© : La liste des alliances est vide.<br>&nbsp;</th>
 			</tr>
 		</table>
 		<?php
@@ -313,7 +313,7 @@ function ARgalaxy_show_ranking_members($sortmode){
 }
 
 /**																		
- * Génère l'ensemble de la page de classement en BBCode en fn° du mode		
+ * GÃ©nÃ¨re l'ensemble de la page de classement en BBCode en fnÂ° du mode		
  * @param string $sortmode accepte deux valeurs : "fusion","sorted" 	
  */
 function ARgalaxy_show_ranking_members_tabtxt($sortmode){
@@ -321,7 +321,7 @@ function ARgalaxy_show_ranking_members_tabtxt($sortmode){
 	global $db, $pub_date, $rank;
 
 //---------------------------------
-	// Récupérer la liste des alliances
+	// RÃ©cupÃ©rer la liste des alliances
 	
 	$case_clause = "";
 	$order_clause = "";
@@ -339,7 +339,7 @@ function ARgalaxy_show_ranking_members_tabtxt($sortmode){
 	
 			//-------------------------------------------------
 			// Trouver la date max de chaque rapport d'alliance
-			// et générer la requete par morceaux la requete de
+			// et gÃ©nÃ©rer la requete par morceaux la requete de
 			// classement des alliances
 			
 			$request = "SELECT ally,MAX(datadate) AS maxdate FROM ".TABLE_RANK_PLAYER_POINTS." WHERE ".get_allies_for_where_sql_clause()." GROUP BY ally"; 
@@ -356,7 +356,7 @@ function ARgalaxy_show_ranking_members_tabtxt($sortmode){
 					$b = intval($maxdate);
 					$where_clause .= " OR (a.ally='".$a."' AND a.datadate=".$b.")";				
 				}
-				// On dégage le 1er OR
+				// On dÃ©gage le 1er OR
 				$where_clause = substr($where_clause,3)." ";
 			}
 			else
@@ -367,7 +367,7 @@ function ARgalaxy_show_ranking_members_tabtxt($sortmode){
 		else
 		{
 			//--------------------------------------------------
-			// L'utilisateur veut les rapports d'une date donnée
+			// L'utilisateur veut les rapports d'une date donnÃ©e
 
 			$where_clause = get_allies_for_where_sql_clause() . " AND a.datadate = ".$pub_date." "; 			
 		}
@@ -376,10 +376,10 @@ function ARgalaxy_show_ranking_members_tabtxt($sortmode){
 		//-------------------------------------------------
 		if (($sortmode == "fusion")&&(!$nothing_to_do))
 		{
-			// Classement général trans alliances
+			// Classement gÃ©nÃ©ral trans alliances
 			$order_clause = " ORDER BY points DESC ";
 					
-			// Trouver la liste des joueurs de TABLE_RANK_MEMBERS pour la where_clause définie
+			// Trouver la liste des joueurs de TABLE_RANK_MEMBERS pour la where_clause dÃ©finie
 
 			echo "<table><tr><td class='f'><font face='courier new'>";		
 			ARtable_header_tabtxt();
@@ -394,16 +394,16 @@ function ARgalaxy_show_ranking_members_tabtxt($sortmode){
 			{
 				$rang++;	
 				
-				// Chercher si un eventuel classement général pour ce joueur
+				// Chercher si un eventuel classement gÃ©nÃ©ral pour ce joueur
 				// Date du dernier classement TOP1500 de ce joueur :
 				$result1 = $db->sql_query("SELECT MAX(datadate) FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='$player'");
 				list($datadate2) = $db->sql_fetch_row($result1);
 				
-				// Si trouvé récupérer les valeurs
+				// Si trouvÃ© rÃ©cupÃ©rer les valeurs
 				if ($datadate2!=NULL)
 				{
 					
-					// dbg("Max date trouvé : $maxdate");
+					// dbg("Max date trouvÃ© : $maxdate");
 					$request = " SELECT rank FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='$player' and datadate=$datadate2";
 					$result1 = $db->sql_query($request);
 					list($rank) = $db->sql_fetch_row($result1);
@@ -429,23 +429,23 @@ function ARgalaxy_show_ranking_members_tabtxt($sortmode){
 					$delta = prec_time((int)$delta);
 				}
 				$blank = "                                                      ";
-				// Rang sur 4 caractères
+				// Rang sur 4 caractÃ¨res
 				$disprang = substr($blank,1,4-strlen($rang)).$rang;
 				
-				// Joueur sur 20 caractères
+				// Joueur sur 20 caractÃ¨res
 				$dispplayer = substr($player,0,19);
 				$dispplayer = substr($blank,1,(20-strlen($dispplayer))/2).$dispplayer.substr($blank,1,(20-strlen($dispplayer))/2);
 				if (strlen($dispplayer)<20) $dispplayer .=" ";
 				
-				// Alliance sur 15 caractères
+				// Alliance sur 15 caractÃ¨res
 				$dispally = substr($ally,0,14);
 				$dispally = substr($blank,1,(15-strlen($dispally))/2).$dispally.substr($blank,1,(15-strlen($dispally))/2);
 				if (strlen($dispally)<15) $dispally .=" ";
 
-				//Points sur 8 caractères
+				//Points sur 8 caractÃ¨res
 				$disppoints = substr($blank,1,8-strlen($points)).number_format($points,0,'','.');
 				
-				// Rang dans le classement général sur 4 caractères
+				// Rang dans le classement gÃ©nÃ©ral sur 4 caractÃ¨res
 				$disprank = substr($blank,1,4-strlen($rank)).$rank;
 				
 				if (!isset($bb)) {$bb="";}
@@ -467,9 +467,9 @@ function ARgalaxy_show_ranking_members_tabtxt($sortmode){
 	{
 		?>
 		<table width='700'>
-			<tr><td class="c">Visualisation des résultats impossible</td></tr>
+			<tr><td class="c">Visualisation des rÃ©sultats impossible</td></tr>
 			<tr>
-			<th><br>Le module n'est pas configuré : La liste des alliances est vide.<br>&nbsp;</th>
+			<th><br>Le module n'est pas configurÃ© : La liste des alliances est vide.<br>&nbsp;</th>
 			</tr>
 		</table>
 		<?php

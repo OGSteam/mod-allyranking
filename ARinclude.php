@@ -36,7 +36,7 @@ function getMenuStatus()
 
 	list($menu)=$db->sql_fetch_row($result);
 
-	// Chercher si l'image ou le titre sont affichés
+	// Chercher si l'image ou le titre sont affichÃ©s
 
 	if (preg_match('/<img[^>]*>/i',$menu)!=false)
 		$icon = 1;
@@ -130,12 +130,12 @@ function delMenuTitle()
 
 /**
  * get_allies Retourne la liste des alliances choisies pour le module allyRanking
- * @return array Tableau de string des alliances ou FALSE si aucune alliance n'est trouvée
+ * @return array Tableau de string des alliances ou FALSE si aucune alliance n'est trouvÃ©e
  * @global integer connect_id de l'instance ogspy de classe sql_db
  */
 function get_allies()
 {
-	// Récupère la liste des alliances définies ds la table config.
+	// RÃ©cupÃ¨re la liste des alliances dÃ©finies ds la table config.
 	$allies = mod_get_option('tagRanking'); 
 
 	if ($allies=="")
@@ -182,12 +182,12 @@ function page_footer()
 {
 	global $db;
 
-	//Récupérer le numéro de version de la base
+	//RÃ©cupÃ©rer le numÃ©ro de version de la base
 	$request = "SELECT version from ".TABLE_MOD." WHERE title='allyranking'";
 	$result = $db->sql_query($request,false);
 	list($version)=$db->sql_fetch_row($result);
 	echo "<br/><B>allyRanking v$version</B> - Jibus&copy;2006-2013<br/>";
-	echo '<B><div>Remise à jour pour OGSpy 3.1.2 </B> - DarkNoon</div>';
+	echo '<B><div>Remise Ã  jour pour OGSpy 3.1.2 </B> - DarkNoon</div>';
 }
 //================================================================================
 //================================================================================
