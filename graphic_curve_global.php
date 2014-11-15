@@ -15,7 +15,7 @@ require_once("mod/allyranking/ARinclude.php");
 $in_list=" IN (";
 for ($nb=0;$nb<count($mblist);$nb++)
 {
-	$in_list .= "'".mysql_real_escape_string($mblist[$nb])."',"; 		
+	$in_list .= "'".$db->sql_escape_string($mblist[$nb])."',"; 		
 }	
 $in_list = substr($in_list,0,strlen($in_list)-1).") ";
 //dbg($in_list);

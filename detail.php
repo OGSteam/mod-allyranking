@@ -98,8 +98,7 @@ if (!isset($pub_memberslist)) $pub_memberslist = array();
 		echo "\t<tr>\n";
 		echo "\t\t<th width='100'>$allies[$i]</th>\n";
 		echo "\t\t<th align='left' valign='top' width='150'>\n";
-		$query = "SELECT DISTINCT player FROM ".TABLE_RANK_PLAYER_POINTS." WHERE ally='".mysql_real_escape_string($allies[$i])."' ORDER BY player";
-		//dbg($query);
+		$query = "SELECT DISTINCT player FROM ".TABLE_RANK_PLAYER_POINTS." WHERE ally='".$db->sql_escape_string($allies[$i])."' ORDER BY player";
 		$result = $db->sql_query($query);
 		$j=1;
 

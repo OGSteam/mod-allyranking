@@ -154,11 +154,12 @@ function get_allies()
 
 function get_allies_for_where_sql_clause(){
 	
+	global $db;
 	$allies = get_allies();
 	if( $allies != false){
-		$where_allies = " (ally='".mysql_real_escape_string($allies[0])."' ";
+		$where_allies = " (ally='".$db->sql_escape_string($allies[0])."' ";
 		for ($i=1;$i<count($allies);$i++)
-			$where_allies .= " OR ally='".mysql_real_escape_string($allies[$i])."' "; 
+			$where_allies .= " OR ally='".$db->sql_escape_string($allies[$i])."' "; 
 		$where_allies .=") ";
 		
 	}else{

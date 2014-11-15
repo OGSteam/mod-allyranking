@@ -30,7 +30,7 @@ $dates = array();
 
 $request = "select player, datadate, points";
 $request .= " from ".TABLE_RANK_PLAYER_POINTS;
-$request .= " where (player = '".mysql_escape_string($player)."' or player = '".mysql_escape_string($player_comp)."')";
+$request .= " where (player = '".$db->mysql_escape_string($player)."' or player = '".$db->mysql_escape_string($player_comp)."')";
 //$request .= " and datadate between ".$start." and ".$end;
 $request .= " order by datadate asc";
 

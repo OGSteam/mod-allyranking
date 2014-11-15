@@ -157,7 +157,7 @@ function ARevo_member(){
 	//--------------------------------------------
 	// Déterminer les bornes de date pour le graph
 	
-	$query = "SELECT MIN(datadate), MAX(datadate) FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='".mysql_real_escape_string($pub_member)."' GROUP BY player";
+	$query = "SELECT MIN(datadate), MAX(datadate) FROM ".TABLE_RANK_PLAYER_POINTS." WHERE player='".$db->sql_escape_string($pub_member)."' GROUP BY player";
 	$result = $db->sql_query($query);
     list($min,$max)=$db->sql_fetch_row($result);
 	
@@ -217,7 +217,7 @@ function ARgalaxy_show_ranking_members($sortmode){
 				$where_clause = "";
 				while (list($ally,$maxdate) = $db->sql_fetch_row($result))
 				{
-					$a = mysql_real_escape_string($ally);
+					$a = $db->sql_escape_string($ally);
 					$b = intval($maxdate);
 					$where_clause .= " OR (a.ally='".$a."' AND a.datadate=".$b.")";				
 				}
@@ -352,7 +352,7 @@ function ARgalaxy_show_ranking_members_tabtxt($sortmode){
 				$where_clause = "";
 				while (list($ally,$maxdate) = $db->sql_fetch_row($result))
 				{
-					$a = mysql_real_escape_string($ally);
+					$a = $db->sql_escape_string($ally);
 					$b = intval($maxdate);
 					$where_clause .= " OR (a.ally='".$a."' AND a.datadate=".$b.")";				
 				}

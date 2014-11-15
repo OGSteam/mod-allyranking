@@ -55,7 +55,7 @@ list($icon,$title) = $res;
 
 if (isset($pub_submitbt) && $pub_submitbt == "Envoyer")
 {
-	$pub_tagRanking = mysql_real_escape_string($pub_tagRanking);
+	$pub_tagRanking = $db->sql_escape_string($pub_tagRanking);
 	mod_set_option('tagRanking',$pub_tagRanking);
 }
 
