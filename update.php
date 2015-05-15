@@ -13,7 +13,7 @@
 	global $db;
 
 // Avant tout, faire le ménage pour que les requetes s'executent correctement !
-if( mysql_num_rows( mysql_query("SHOW TABLES LIKE '".$table_prefix.TABLE_MOD."'"))){
+if( $db->sql_numrows( $db->sql_query("SHOW TABLES LIKE '".$table_prefix.TABLE_MOD."'"))){
 
 	$db->sql_query("DELETE FROM ".TABLE_MOD." WHERE title='allyranking'",DEBUG,true);
 	$db->sql_query("DROP TABLE IF EXISTS ".TABLE_RANK_MEMBERS,DEBUG,true);
@@ -25,7 +25,7 @@ if( mysql_num_rows( mysql_query("SHOW TABLES LIKE '".$table_prefix.TABLE_MOD."'"
 	update_mod($mod_folder,$mod_name);
 	
  //On vérifie que la table xtense_callbacks existe (Xtense2)
-if( mysql_num_rows( mysql_query("SHOW TABLES LIKE '".$table_prefix."xtense_callbacks"."'")))
+if( $db->sql_numrows( $db->sql_query("SHOW TABLES LIKE '".$table_prefix."xtense_callbacks"."'")))
   {
   // Si oui, on récupère le n° d'id du mod
   $query = "SELECT `id` FROM `".TABLE_MOD."` WHERE `action`='allyranking' AND `active`='1' LIMIT 1";
