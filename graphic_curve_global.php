@@ -96,6 +96,6 @@ if ($mblist=="")
 	echo $curve;
 	
 	}
-?>
+
 
 

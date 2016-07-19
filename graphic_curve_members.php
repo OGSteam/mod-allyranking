@@ -59,9 +59,3 @@ $zoom = "true";
 
 $curve = create_multi_curve('Evolution '.$player,'Points',$data,$names,'evol_member');
 echo $curve;
-
-
-
-
-
-?>
