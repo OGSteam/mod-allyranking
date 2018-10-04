@@ -1,3 +1,4 @@
 allyranking
-1.2.0
+1.2.1
 allyranking,Ally Ranking,allyranking,allyranking,allyRankingMain.php,1,0
+3.3.2
